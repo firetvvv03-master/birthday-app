@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+
+<title>Birthday Celebration</title>
+
+<style>
+
+body{
+    margin:0;
+    padding:20px;
+    text-align:center;
+    font-family:Arial,sans-serif;
+    background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+}
+
+h1{
+    color:white;
+}
+
+input,textarea,select{
+    padding:10px;
+    margin:8px;
+    border-radius:8px;
+    border:none;
+}
+
+textarea{
+    width:90%;
+    max-width:700px;
+}
+
+button{
+    padding:12px 20px;
+    background:#ff4081;
+    color:white;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+}
+
+button:hover{
+    background:#e91e63;
+}
+
+#heroImage{
+    width:220px;
+    height:220px;
+    object-fit:cover;
+    border-radius:50%;
+    border:8px solid gold;
+    display:none;
+    margin:20px auto;
+}
+
+#cake{
+    width:600px;
+    max-width:95%;
+    min-height:250px;
+    margin:20px auto;
+    background:#ff69b4;
+    color:white;
+    border-radius:20px 20px 80px 80px;
+    box-shadow:0 5px 20px rgba(0,0,0,.3);
+}
+
+#cakeTop{
+    height:35px;
+    background:white;
+    border-radius:50%;
+}
+
+#cakeMessage{
+    padding:20px;
+    font-size:20px;
+}
+
+.slideshow{
+    width:700px;
+    max-width:95%;
+    height:400px;
+    margin:auto;
+    overflow:hidden;
+    border-radius:15px;
+    background:white;
+}
+
+.slideshow img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+}
+
+#videoGallery{
+    margin-top:30px;
+}
+
+#videoGallery iframe{
+    width:90%;
+    max-width:700px;
+    height:400px;
+    display:block;
+    margin:15px auto;
+    border:none;
+    border-radius:15px;
+}
+
+.cake-fall{
+    position: fixed;
+    top: -40px;
+    pointer-events: none;
+    z-index: 9999;
+    font-size: 22px; /* smaller cakes */
+    will-change: transform;
+}
+
+@keyframes fallCake {
+    0% {
+        transform: translateY(-40px) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(110vh) rotate(360deg);
+        opacity: 0.9;
+    }
+}
+
+@media(max-width:700px){
+
+.slideshow{
+    height:250px;
+}
+
+#heroImage{
+    width:150px;
+    height:150px;
+}
+
+}
+#cake{
+    position:relative;
+}
+
+#candles{
+    position:absolute;
+    top:-40px;
+    left:0;
+    width:100%;
+    height:50px;
+    z-index:10;
+}
+
+.candle{
+    position:absolute;
+    width:10px;
+    height:35px;
+    background:repeating-linear-gradient(
+        45deg,
+        #ff6b6b,
+        #ff6b6b 4px,
+        white 4px,
+        white 8px
+    );
+    transform:translateX(-50%);
+    border-radius:4px;
+}
+
+.flame{
+    position:absolute;
+    width:12px;
+    height:18px;
+    top:-16px;
+    left:50%;
+    transform:translateX(-50%);
+    background:gold;
+    border-radius:50% 50% 50% 50%;
+    box-shadow:
+        0 0 8px orange,
+        0 0 15px yellow,
+        0 0 25px orange;
+    animation:flicker .25s infinite alternate;
+}
+
+@keyframes flicker{
+    0%{
+        transform:translateX(-50%) rotate(-4deg) scale(0.9);
+    }
+    100%{
+        transform:translateX(-50%) rotate(4deg) scale(1.1);
+    }
+}
+</style>
+</head>
+
+
+
+<body>
+<h1>🎂 Happy Birthday Celebration 🎂</h1>
+
+<input type="text" id="nameInput" placeholder="Child Name">
+
+<input type="number"
+       id="ageInput"
+       placeholder="Age"
+       min="1"
+       max="78">
+
+<textarea id="birthdayText"
+          placeholder="Birthday message"></textarea>
+
+
+<br>
+
+<select id="voiceSelect"></select>
+
+<button onclick="readMessage()">
+🔊 Read Message
+</button>
+
+<button onclick="stopReading()">
+⏹ Stop
+</button>
+
+<br><br>
+
+<h3>🦸 Hero Photo</h3>
+
+<input
+type="file"
+id="heroInput"
+accept="image/*">
+
+<br>
+
+<h3>🎵 Birthday Song</h3>
+
+<select id="songSelect">
+    <option value="">Choose a Song</option>
+
+<option value="https://raw.githubusercontent.com/firetvvv03-master/bdmusic/main/saavane-happy-birthday-254480.mp3">
+    Happy Birthday - Saavane
+</option>
+
+
+    <option value="upload">
+        🎵 Use My Own Song
+    </option>
+</select>
+
+<br><br>
+
+<div id="customMusicArea" style="display:none;">
+    <input
+        type="file"
+        id="musicInput"
+        accept="audio/*">
+
+    <br><br>
+
+    <input
+        type="text"
+        id="customSongUrl"
+        placeholder="Or paste MP3 URL"
+        style="width:300px;">
+</div>
+
+<br>
+
+<h3>🖼️ Upload Photos (Max 20)</h3>
+
+<input
+type="file"
+id="photoInput"
+accept="image/*"
+multiple>
+
+<br>
+
+<h3>🎥 Upload Videos (Max 3)</h3>
+
+<h3>🎥 Videos</h3>
+
+<input
+type="file"
+id="videoInput"
+accept="video/*"
+multiple>
+
+<br><br>
+
+<button onclick="startCelebration()">
+    Start Celebration
+</button>
+
+<button onclick="stopCelebration()">
+    Stop Celebration
+</button>
+
+<br><br>
+
+<img id="heroImage">
+
+<div id="cake">
+    <div id="candles"></div>
+
+    <div id="cakeTop"></div>
+
+    <div id="cakeMessage">
+        Your birthday message appears here.
+    </div>
+</div>
+
+<div class="slideshow">
+<img id="slideImage">
+</div>
+
+
+<h2>🎥 Birthday Videos</h2>
+
+<div id="videoGallery"></div>
+
+<audio id="audioPlayer" controls></audio>
+
+<script>
+let voices=[];
+let photos=[];
+let currentPhoto=0;
+let slideshowTimer;
+
+function loadVoices(){
+
+    voices=speechSynthesis.getVoices();
+
+    const select=
+    document.getElementById(
+    "voiceSelect"
+    );
+
+    select.innerHTML="";
+
+    voices.forEach((voice,index)=>{
+
+        const option=
+        document.createElement(
+        "option"
+        );
+
+        option.value=index;
+
+        option.text=
+        voice.name+" ("+
+        voice.lang+")";
+
+        select.appendChild(option);
+    });
+}
+
+speechSynthesis.onvoiceschanged=
+loadVoices;
+
+loadVoices();
+
+function readMessage(){
+
+    const text=
+    document.getElementById(
+    "birthdayText"
+    ).value;
+
+    if(text==="") return;
+
+    speechSynthesis.cancel();
+
+    const speech=
+    new SpeechSynthesisUtterance(
+    text
+    );
+
+    speech.voice=
+    voices[
+    document.getElementById(
+    "voiceSelect"
+    ).value
+    ];
+
+    speechSynthesis.speak(
+    speech
+    );
+}
+
+function stopReading(){
+
+    speechSynthesis.cancel();
+}
+document
+.getElementById("songSelect")
+.addEventListener("change", function(){
+
+    const area =
+    document.getElementById(
+        "customMusicArea"
+    );
+
+    area.style.display =
+        this.value === "upload"
+        ? "block"
+        : "none";
+});
+
+function startCelebration() {
+
+    let name =
+        document.getElementById("nameInput").value;
+
+    if (name === "") {
+        name = "Friend";
+    }
+
+    const text =
+        document.getElementById("birthdayText").value;
+
+    document.getElementById("cakeMessage").innerHTML =
+        "<h2>🎂 Happy Birthday " +
+        name +
+        " 🎂</h2><br>" +
+        text;
+
+   loadHero();
+loadMusic();
+loadPhotos();
+loadVideos();
+
+startCakeRain();
+    const age =
+        parseInt(
+            document.getElementById("ageInput").value
+        ) || 1;
+
+    createCandles(age);
+}
+
+
+function loadHero(){
+
+    const file=
+    document.getElementById(
+    "heroInput"
+    ).files[0];
+
+    if(!file) return;
+
+    const hero=
+    document.getElementById(
+    "heroImage"
+    );
+
+    hero.src=
+    URL.createObjectURL(
+    file
+    );
+
+    hero.style.display=
+    "block";
+}
+
+function loadMusic(){
+
+    const player =
+    document.getElementById(
+        "audioPlayer"
+    );
+
+    const selectedSong =
+    document.getElementById(
+        "songSelect"
+    ).value;
+
+    if(selectedSong &&
+       selectedSong !== "upload")
+    {
+        player.src =
+        selectedSong;
+
+        player.play();
+
+        return;
+    }
+
+    const customUrl =
+    document.getElementById(
+        "customSongUrl"
+    ).value.trim();
+
+    if(customUrl){
+        player.src = customUrl;
+        player.play();
+        return;
+    }
+
+    const file =
+    document.getElementById(
+        "musicInput"
+    ).files[0];
+
+    if(!file) return;
+
+    player.src =
+    URL.createObjectURL(file);
+
+    player.play();
+}
+
+function loadPhotos(){
+
+    const files=
+    document.getElementById(
+    "photoInput"
+    ).files;
+
+    if(files.length===0)
+        return;
+
+    if(files.length>20){
+
+        alert(
+        "Maximum 20 photos."
+        );
+
+        return;
+    }
+
+    photos=[];
+
+    for(let i=0;i<files.length;i++){
+
+        photos.push(
+        URL.createObjectURL(
+        files[i]
+        ));
+    }
+
+    currentPhoto=0;
+
+    document.getElementById(
+    "slideImage"
+    ).src=
+    photos[0];
+
+    clearInterval(
+    slideshowTimer
+    );
+
+    slideshowTimer=
+    setInterval(
+    nextPhoto,
+    3000
+    );
+}
+
+function nextPhoto(){
+
+    currentPhoto++;
+
+    if(
+    currentPhoto>=
+    photos.length
+    ){
+        currentPhoto=0;
+    }
+
+    document.getElementById(
+    "slideImage"
+    ).src=
+    photos[currentPhoto];
+}
+
+function loadVideos() {
+    const gallery =
+        document.getElementById("videoGallery");
+
+    gallery.innerHTML = "";
+
+    // Local uploaded videos
+    const files =
+        document.getElementById("videoInput").files;
+
+    for (let i = 0; i < Math.min(files.length, 3); i++) {
+        const video = document.createElement("video");
+        video.controls = true;
+        video.src = URL.createObjectURL(files[i]);
+        gallery.appendChild(video);
+    }
+}
+
+let cakeInterval;
+
+function createCake() {
+    const cakes = ["🎂", "🧁", "🍰"];
+
+    const cake = document.createElement("div");
+    cake.className = "cake-fall";
+    cake.textContent =
+        cakes[Math.floor(Math.random() * cakes.length)];
+
+    cake.style.left = Math.random() * 100 + "vw";
+
+    // random pastel colors
+    const colors = [
+        "#ff69b4",
+        "#ffb347",
+        "#87cefa",
+        "#98fb98",
+        "#dda0dd",
+        "#ffd700"
+    ];
+
+    cake.style.color =
+        colors[Math.floor(Math.random() * colors.length)];
+
+    cake.style.fontSize =
+        (18 + Math.random() * 12) + "px";
+
+    const duration = 5 + Math.random() * 4;
+
+    cake.style.animation =
+        `fallCake ${duration}s linear forwards`;
+
+    document.body.appendChild(cake);
+
+    setTimeout(() => cake.remove(), duration * 1000);
+}
+
+function startCakeRain() {
+
+    clearInterval(cakeInterval);
+
+    cakeInterval = setInterval(createCake, 150);
+
+}
+
+function stopCakeRain() {
+    clearInterval(cakeInterval);
+}
+
+function randomColor(){
+
+    const colors=[
+    "#ff4081",
+    "#2196f3",
+    "#4caf50",
+    "#ff9800",
+    "#ffeb3b",
+    "#9c27b0"
+    ];
+
+    return colors[
+    Math.floor(
+    Math.random()*
+    colors.length
+    )
+    ];
+}
+function createCandles(age) {
+
+    const container =
+        document.getElementById("candles");
+
+    if (!container) return;
+
+    container.innerHTML = "";
+
+    const candleCount = Math.min(age, 30);
+
+    for(let i = 0; i < candleCount; i++) {
+
+        const candle =
+            document.createElement("div");
+
+        candle.className = "candle";
+
+        const flame =
+            document.createElement("div");
+
+        flame.className = "flame";
+
+        candle.appendChild(flame);
+
+        candle.style.left =
+            ((i + 1) * 100 / (candleCount + 1)) + "%";
+
+        container.appendChild(candle);
+    }
+}
+function stopCelebration() {
+
+    // stop falling cakes
+    stopCakeRain();
+
+    // remove cakes already falling
+    document.querySelectorAll(".cake-fall").forEach(cake => {
+        cake.remove();
+    });
+
+    // stop slideshow
+    clearInterval(slideshowTimer);
+
+    // remove candles
+    document.getElementById("candles").innerHTML = "";
+
+    // stop audio
+    const player = document.getElementById("audioPlayer");
+    player.pause();
+    player.currentTime = 0;
+
+    // stop speech
+    speechSynthesis.cancel();
+}
+
+</script>
+
+</body>
+</html>
