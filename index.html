@@ -55,13 +55,12 @@ button:hover{
     margin:20px auto;
 }
 
-#cake{
+ #cake{
     width:600px;
     max-width:95%;
     min-height:250px;
-    margin:20px auto;
+    margin:80px auto 20px auto;
     background:#ff69b4;
-    color:white;
     border-radius:20px 20px 80px 80px;
     box-shadow:0 5px 20px rgba(0,0,0,.3);
 }
@@ -191,6 +190,21 @@ button:hover{
         transform:translateX(-50%) rotate(4deg) scale(1.1);
     }
 }
+#partyCameraBtn{
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    width:70px;
+    height:70px;
+    border-radius:50%;
+    font-size:28px;
+    z-index:9999;
+    background:#ff4081;
+    color:white;
+    border:none;
+    box-shadow:0 4px 12px rgba(0,0,0,.3);
+}
+
 </style>
 </head>
 
@@ -225,7 +239,7 @@ button:hover{
 
 <br><br>
 
-<h3>🦸 Hero Photo</h3>
+<h3>🦸 Birthday Person Photo</h3>
 
 <input
 type="file"
@@ -268,7 +282,18 @@ accept="image/*">
 
 <br>
 
-<h3>🖼️ Upload Photos (Max 20)</h3>
+<input
+    type="file"
+    id="cameraInput"
+    accept="image/*"
+    capture="environment"
+    style="display:none;">
+<h3>🖼️ Upload Photos (Max 100)</h3>
+
+
+<button onclick="takePartyPhoto()">
+📸 Take Party Photo
+</button>
 
 <input
 type="file"
@@ -292,6 +317,10 @@ multiple>
 
 <button onclick="startCelebration()">
     Start Celebration
+</button>
+
+<button onclick="pauseCelebration()">
+    Pause Celebration
 </button>
 
 <button onclick="stopCelebration()">
@@ -328,6 +357,7 @@ let voices=[];
 let photos=[];
 let currentPhoto=0;
 let slideshowTimer;
+let isPaused = false;
 
 function loadVoices(){
 
@@ -389,7 +419,9 @@ function readMessage(){
     speech
     );
 }
-
+function takePartyPhoto() {
+    document.getElementById("cameraInput").click();
+}
 function stopReading(){
 
     speechSynthesis.cancel();
@@ -410,7 +442,27 @@ document
 });
 
 function startCelebration() {
+if(isPaused){
 
+    const player =
+        document.getElementById("audioPlayer");
+
+    player.play();
+
+    slideshowTimer =
+        setInterval(nextPhoto, 3000);
+
+    startCakeRain();
+
+document.querySelectorAll(".cake-fall").forEach(cake => {
+    cake.style.animationPlayState = "running";
+});
+    speechSynthesis.resume();
+
+    isPaused = false;
+
+    return;
+}
     let name =
         document.getElementById("nameInput").value;
 
@@ -522,10 +574,10 @@ function loadPhotos(){
     if(files.length===0)
         return;
 
-    if(files.length>20){
+    if(files.length>100){
 
         alert(
-        "Maximum 20 photos."
+        "Maximum 100 photos."
         );
 
         return;
@@ -693,7 +745,32 @@ function createCandles(age) {
         container.appendChild(candle);
     }
 }
+
+function pauseCelebration() {
+
+    isPaused = true;
+
+    clearInterval(slideshowTimer);
+
+    stopCakeRain();
+
+    // Pause music
+    const player =
+        document.getElementById("audioPlayer");
+
+    player.pause();
+
+    // Pause speech
+    speechSynthesis.pause();
+
+    // Pause all falling cakes
+    document.querySelectorAll(".cake-fall").forEach(cake => {
+        cake.style.animationPlayState = "paused";
+    });
+
+}
 function stopCelebration() {
+isPaused = false;
 
     // stop falling cakes
     stopCakeRain();
@@ -717,6 +794,36 @@ function stopCelebration() {
     // stop speech
     speechSynthesis.cancel();
 }
+document.getElementById("cameraInput")
+.addEventListener("change", function () {
+
+    if (!this.files.length) return;
+
+    const file = this.files[0];
+
+    const newPhoto =
+        URL.createObjectURL(file);
+
+    photos.unshift(newPhoto);
+
+    currentPhoto = 0;
+
+    document.getElementById(
+        "slideImage"
+    ).src = newPhoto;
+
+    alert("🎉 New party photo added!");
+
+    clearInterval(slideshowTimer);
+
+    setTimeout(() => {
+
+        slideshowTimer =
+            setInterval(nextPhoto, 3000);
+
+    }, 5000);
+
+});
 
 </script>
 
