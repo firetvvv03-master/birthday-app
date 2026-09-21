@@ -1109,12 +1109,23 @@ function saveCelebration(){
         songUrl: document.getElementById("customSongUrl").value
     };
 
-    localStorage.setItem(
-        "birthdayCelebration",
-        JSON.stringify(data)
+    const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        {type:"application/json"}
     );
 
-    alert("💾 Celebration Saved!");
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement("a");
+
+    a.href = url;
+    a.download = "birthday-save.json";
+
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    URL.revokeObjectURL(url);
 }
 
 function loadCelebration(){
@@ -1172,23 +1183,22 @@ function exportCelebration(){
 
 function savePicture(){
 
-   html2canvas(document.body,{
-    backgroundColor:null,
-    scale:2
-})
-        .then(canvas => {
+    html2canvas(document.body,{
+        backgroundColor:null,
+        scale:2
+    }).then(canvas => {
 
-            const link =
-                document.createElement("a");
+        const image =
+            canvas.toDataURL("image/png");
 
-            link.download =
-                "birthday-memory.png";
+        const win = window.open();
 
-            link.href =
-                canvas.toDataURL("image/png");
-
-            link.click();
-        });
+        win.document.write(
+            '' +
+            image +
+            ''
+        );
+    });
 }
 
 </script>
