@@ -7,7 +7,15 @@
 <title>Birthday Celebration</title>
 
 <style>
+.save-section{
+    margin-top:40px;
+    padding-top:20px;
+    border-top:2px solid rgba(255,255,255,.4);
+}
 
+.save-section h3{
+    color:white;
+}
 body{
     margin:0;
     padding:20px;
@@ -204,13 +212,50 @@ button:hover{
     border:none;
     box-shadow:0 4px 12px rgba(0,0,0,.3);
 }
+.confetti{
+    position:fixed;
+    pointer-events:none;
+    z-index:9999;
 
+}
+
+@keyframes confettiFall{
+    0%{
+        transform:translateY(-20px) rotate(0deg);
+        opacity:1;
+    }
+
+    100%{
+        transform:translateY(110vh) rotate(1080deg);
+        opacity:0;
+    }
+}
+#countdownOverlay{
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.9);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:10000;
+}
+
+#countdownNumber{
+    color:white;
+    font-size:min(8rem,20vw);
+    font-weight:bold;
+    text-align:center;
+    padding:20px;
+}
 </style>
 </head>
 
-
-
 <body>
+
+<div id="countdownOverlay" style="display:none;">
+    <div id="countdownNumber">3</div>
+</div>
+
 <h1>🎂 Happy Birthday Celebration 🎂</h1>
 
 <input type="text" id="nameInput" placeholder="Child Name">
@@ -315,7 +360,7 @@ multiple>
 
 <br><br>
 
-<button onclick="startCelebration()">
+<button onclick="startCountdown()">
     Start Celebration
 </button>
 
@@ -325,6 +370,10 @@ multiple>
 
 <button onclick="stopCelebration()">
     Stop Celebration
+</button>
+
+<button onclick="clearAll()">
+    🗑️ Clear All
 </button>
 
 <br><br>
@@ -340,7 +389,9 @@ multiple>
         Your birthday message appears here.
     </div>
 </div>
-
+<button onclick="blowCandles()">
+    💨 Blow Out Candles
+</button>
 <div class="slideshow">
 <img id="slideImage">
 </div>
@@ -440,34 +491,152 @@ document
         ? "block"
         : "none";
 });
+function launchConfetti() {
 
-function startCelebration() {
-if(isPaused){
+    for(let i = 0; i < 200; i++) {
 
-    const player =
-        document.getElementById("audioPlayer");
+        const piece =
+            document.createElement("div");
 
-    player.play();
+        piece.className = "confetti";
 
-    slideshowTimer =
-        setInterval(nextPhoto, 3000);
+        const colors = [
+            "#ff4081",
+            "#ffeb3b",
+            "#4caf50",
+            "#2196f3",
+            "#ff9800",
+            "#9c27b0"
+        ];
 
-    startCakeRain();
+        piece.style.background =
+            colors[Math.floor(Math.random() * colors.length)];
 
-document.querySelectorAll(".cake-fall").forEach(cake => {
-    cake.style.animationPlayState = "running";
-});
-    speechSynthesis.resume();
+        const size =
+            3 + Math.random() * 4;
 
-    isPaused = false;
+        piece.style.width =
+            size + "px";
 
-    return;
+        piece.style.height =
+            size + "px";
+
+        piece.style.borderRadius =
+            "50%";
+
+        /* Start in center */
+        piece.style.left = "50vw";
+        piece.style.top = "40vh";
+
+        document.body.appendChild(piece);
+
+        const angle =
+            Math.random() * Math.PI * 2;
+
+        const distance =
+            550 + Math.random() * 500;
+
+        const x =
+            Math.cos(angle) * distance;
+
+        const y =
+            Math.sin(angle) * distance;
+
+        piece.animate(
+            [
+                {
+                    transform:
+                        "translate(0,0) scale(1)",
+                    opacity: 1
+                },
+                {
+                    transform:
+                        `translate(${x}px, ${y}px)
+                         rotate(720deg)`,
+                    opacity: 0
+                }
+            ],
+            {
+                duration: 7500,
+                easing: "cubic-bezier(.1,.8,.2,1)",
+                fill: "forwards"
+            }
+        );
+
+        setTimeout(() => {
+            piece.remove();
+        }, 7500);
+    }
 }
+function startCountdown() {
+
+    const overlay =
+        document.getElementById("countdownOverlay");
+
+    const number =
+        document.getElementById("countdownNumber");
+
+    const items = [
+        "3",
+        "2",
+        "1",
+        "🎉 HAPPY BIRTHDAY! 🎉"
+    ];
+
+    let index = 0;
+
+    overlay.style.display = "flex";
+overlay.style.flexDirection = "column";
+    number.textContent = items[0];
+
+    const timer = setInterval(() => {
+
+        index++;
+
+        if(index < items.length){
+
+            number.textContent = items[index];
+
+        }else{
+
+            clearInterval(timer);
+
+            setTimeout(() => {
+
+                overlay.style.display = "none";
+
+                startCelebration();
+
+            }, 1500);
+
+        }
+
+    },1000);
+}
+function startCelebration() {
+
+    if(isPaused){
+
+        const player =
+            document.getElementById("audioPlayer");
+
+        player.play();
+
+        slideshowTimer =
+            setInterval(nextPhoto,3000);
+
+        startCakeRain();
+
+        isPaused = false;
+
+        return;
+    }
+
     let name =
         document.getElementById("nameInput").value;
 
-    if (name === "") {
-        name = "Friend";
+    if(name===""){
+        name="Friend";
     }
 
     const text =
@@ -479,12 +648,45 @@ document.querySelectorAll(".cake-fall").forEach(cake => {
         " 🎂</h2><br>" +
         text;
 
-   loadHero();
-loadMusic();
-loadPhotos();
-loadVideos();
+    loadHero();
+    loadMusic();
+    loadPhotos();
+    loadVideos();
 
-startCakeRain();
+    startCakeRain();
+
+    launchConfetti();
+
+setTimeout(() => {
+    launchConfetti();
+}, 5000);
+
+setTimeout(() => {
+    launchConfetti();
+}, 9000);
+
+setTimeout(() => {
+    launchConfetti();
+}, 13000);
+
+setTimeout(() => {
+    launchConfetti();
+}, 16000);
+setTimeout(() => {
+    launchConfetti();
+}, 20000);
+
+setTimeout(() => {
+    launchConfetti();
+}, 24000);
+
+setTimeout(() => {
+    launchConfetti();
+}, 28000);
+
+setTimeout(() => {
+    launchConfetti();
+}, 32000);
     const age =
         parseInt(
             document.getElementById("ageInput").value
@@ -492,8 +694,6 @@ startCakeRain();
 
     createCandles(age);
 }
-
-
 function loadHero(){
 
     const file=
@@ -745,7 +945,48 @@ function createCandles(age) {
         container.appendChild(candle);
     }
 }
+function blowCandles() {
 
+    document
+        .querySelectorAll(".flame")
+        .forEach(flame => {
+
+            flame.style.transition =
+                "all 0.8s ease";
+
+            flame.style.opacity = "0";
+            flame.style.transform =
+                "translateX(-50%) scale(0)";
+        });
+
+    launchConfetti();
+
+    setTimeout(() => {
+
+    const msg =
+        document.createElement("div");
+
+    msg.innerHTML =
+        "🌟 Make A Wish! 🌟";
+
+    msg.style.position = "fixed";
+    msg.style.top = "50%";
+    msg.style.left = "50%";
+    msg.style.transform =
+        "translate(-50%,-50%)";
+
+    msg.style.fontSize = "3rem";
+    msg.style.color = "white";
+    msg.style.zIndex = "11000";
+
+    document.body.appendChild(msg);
+
+    setTimeout(() => {
+        msg.remove();
+    }, 2500);
+
+}, 800);
+}
 function pauseCelebration() {
 
     isPaused = true;
@@ -767,65 +1008,206 @@ function pauseCelebration() {
     document.querySelectorAll(".cake-fall").forEach(cake => {
         cake.style.animationPlayState = "paused";
     });
-
 }
 function stopCelebration() {
-isPaused = false;
 
-    // stop falling cakes
+    isPaused = false;
+
     stopCakeRain();
 
-    // remove cakes already falling
     document.querySelectorAll(".cake-fall").forEach(cake => {
         cake.remove();
     });
 
-    // stop slideshow
     clearInterval(slideshowTimer);
 
-    // remove candles
     document.getElementById("candles").innerHTML = "";
 
-    // stop audio
-    const player = document.getElementById("audioPlayer");
+    const player =
+        document.getElementById("audioPlayer");
+
     player.pause();
     player.currentTime = 0;
 
-    // stop speech
     speechSynthesis.cancel();
 }
-document.getElementById("cameraInput")
-.addEventListener("change", function () {
 
-    if (!this.files.length) return;
+function clearAll() {
 
-    const file = this.files[0];
+document.querySelectorAll(".confetti")
+.forEach(piece => piece.remove());
+    const answer = confirm(
+        "🗑️ Are you sure you want to clear everything and start a new celebration?"
+    );
 
-    const newPhoto =
-        URL.createObjectURL(file);
+    if (!answer) {
+        return;
+    }
 
-    photos.unshift(newPhoto);
+    stopCelebration();
 
+document.querySelectorAll(".confetti")
+.forEach(piece => piece.remove());
+    document.getElementById("nameInput").value = "";
+    document.getElementById("ageInput").value = "";
+    document.getElementById("birthdayText").value = "";
+
+    document.getElementById("customSongUrl").value = "";
+
+    document.getElementById("heroInput").value = "";
+    document.getElementById("photoInput").value = "";
+    document.getElementById("videoInput").value = "";
+    document.getElementById("musicInput").value = "";
+    document.getElementById("cameraInput").value = "";
+
+    document.getElementById("songSelect").selectedIndex = 0;
+
+    const hero =
+        document.getElementById("heroImage");
+
+    hero.src = "";
+    hero.style.display = "none";
+
+    photos = [];
     currentPhoto = 0;
 
     document.getElementById(
         "slideImage"
-    ).src = newPhoto;
+    ).src = "";
 
-    alert("🎉 New party photo added!");
+    document.getElementById(
+        "videoGallery"
+    ).innerHTML = "";
 
-    clearInterval(slideshowTimer);
+    document.getElementById(
+        "cakeMessage"
+    ).innerHTML =
+        "Your birthday message appears here.";
 
-    setTimeout(() => {
+    document.getElementById(
+        "candles"
+    ).innerHTML = "";
 
-        slideshowTimer =
-            setInterval(nextPhoto, 3000);
+    const player =
+        document.getElementById("audioPlayer");
 
-    }, 5000);
+    player.pause();
+    player.src = "";
 
-});
+    document.getElementById(
+        "customMusicArea"
+    ).style.display = "none";
+
+    alert("✅ Ready for a new celebration!");
+}
+function saveCelebration(){
+
+    const data = {
+        name: document.getElementById("nameInput").value,
+        age: document.getElementById("ageInput").value,
+        message: document.getElementById("birthdayText").value,
+        songUrl: document.getElementById("customSongUrl").value
+    };
+
+    localStorage.setItem(
+        "birthdayCelebration",
+        JSON.stringify(data)
+    );
+
+    alert("💾 Celebration Saved!");
+}
+
+function loadCelebration(){
+
+    const data = JSON.parse(
+        localStorage.getItem("birthdayCelebration")
+    );
+
+    if(!data){
+        alert("No saved celebration found.");
+        return;
+    }
+
+    document.getElementById("nameInput").value =
+        data.name || "";
+
+    document.getElementById("ageInput").value =
+        data.age || "";
+
+    document.getElementById("birthdayText").value =
+        data.message || "";
+
+    document.getElementById("customSongUrl").value =
+        data.songUrl || "";
+
+    alert("📂 Celebration Loaded!");
+}
+
+function exportCelebration(){
+
+    const data = {
+        name: document.getElementById("nameInput").value,
+        age: document.getElementById("ageInput").value,
+        message: document.getElementById("birthdayText").value
+    };
+
+    const blob = new Blob(
+        [JSON.stringify(data, null, 2)],
+        {
+            type: "application/json"
+        }
+    );
+
+    const link =
+        document.createElement("a");
+
+    link.href =
+        URL.createObjectURL(blob);
+
+    link.download =
+        "birthday-party.json";
+
+    link.click();
+}
+
+function savePicture(){
+
+   html2canvas(document.body,{
+    backgroundColor:null,
+    scale:2
+})
+        .then(canvas => {
+
+            const link =
+                document.createElement("a");
+
+            link.download =
+                "birthday-memory.png";
+
+            link.href =
+                canvas.toDataURL("image/png");
+
+            link.click();
+        });
+}
 
 </script>
 
+<button onclick="saveCelebration()">
+    💾 Save Celebration
+</button>
+
+<button onclick="loadCelebration()">
+    📂 Load Celebration
+</button>
+
+<button onclick="exportCelebration()">
+    📥 Export Party
+</button>
+
+<button onclick="savePicture()">
+    📸 Save Memory
+</button>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
